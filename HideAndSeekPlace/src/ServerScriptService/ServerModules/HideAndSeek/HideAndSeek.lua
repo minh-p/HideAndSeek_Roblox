@@ -8,15 +8,15 @@ local hideAndSeekModules = ServerScriptService.ServerModules.HideAndSeek
 
 local HideAndSeek = {}
 
-function HideAndSeek:create(properties, seekerTeamName, seekerTeamBrickColor, hiderTeamName, hiderTeamBrickColor, teamToDeassignTo)
-    properties = properties or {
+function HideAndSeek:create(object, seekerTeamName, seekerTeamBrickColor, hiderTeamName, hiderTeamBrickColor, teamToDeassignTo)
+    object = object or {
         round = require(hideAndSeekModules.Round):create(nil);
         seeker = require(hideAndSeekModules.Seeker):create(nil, seekerTeamName, seekerTeamBrickColor, teamToDeassignTo);
         hider = require(hideAndSeekModules.Hider):create(nil, hiderTeamName, hiderTeamBrickColor, teamToDeassignTo)
     }
 
     self.__index = self
-    return setmetatable(properties, self)
+    return setmetatable(object, self)
 end
 
 

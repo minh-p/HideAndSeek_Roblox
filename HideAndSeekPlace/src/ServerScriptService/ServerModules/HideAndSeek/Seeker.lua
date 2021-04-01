@@ -3,42 +3,26 @@
 
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local TeamCreateModule = require(ServerScriptService.ServerModules.TeamCreate)
+local serverModules = ServerScriptService.ServerModules
+local TeamClass = require(serverModules.HideAndSeek.Team)
 
-local Seeker = {}
+local Seeker = TeamClass:create()
 
-function Seeker:create(properties, teamName, teamBrickColor, teamToDeassignTo)
-    properties = properties or {
-        teamInstance = TeamCreateModule.create(teamName, teamBrickColor);
-        teamToDeassignTo = teamToDeassignTo
-    }
-
+function Seeker:create(object, teamName, teamBrickColor, teamToDeassignTo)
+    object = object or TeamClass:create(object, teamName, teamBrickColor, teamToDeassignTo)
+    setmetatable(object, self)
     self.__index = self
-    return setmetatable(properties, self)
+    return object
 end
 
 
-function Seeker:getPlayersInSeekerTeam()
-    return self.teamInstance:GetPlayers()
-end
+function Seeker.onAssigning(player)
 
-function Seeker:assign(player)
-    assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
-    
-    player.Team = self.teamInstance
-    -- Add more here
 end
 
 
-function Seeker:deAssign(player)
-    assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
-    
-    local playerOriginalTeam = player.Team
-    if not playerOriginalTeam ~= self.teamInstance then return end
+function Seeker.onDeassigning(player)
 
-    -- Do other things to de assign player out of the seeker team
-
-    player.Team = self.teamToDeassignTo
 end
 
 return Seeker

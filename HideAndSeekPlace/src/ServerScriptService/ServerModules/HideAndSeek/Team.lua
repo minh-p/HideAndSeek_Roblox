@@ -7,14 +7,15 @@ local TeamCreateModule = require(ServerScriptService.ServerModules.TeamCreate)
 
 local Team = {}
 
-function Team:create(properties, teamName, teamBrickColor, teamToDeassignTo)
-    properties = properties or {
+function Team:create(object, teamName, teamBrickColor, teamToDeassignTo)
+    object = object or {
         teamInstance = TeamCreateModule.create(teamName, teamBrickColor);
         teamToDeassignTo = teamToDeassignTo
     }
 
+    setmetatable(object, self)
     self.__index = self
-    return setmetatable(properties, self)
+    return object
 end
 
 

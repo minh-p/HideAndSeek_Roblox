@@ -3,43 +3,26 @@
 
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local TeamCreateModule = require(ServerScriptService.ServerModules.TeamCreate)
+local serverModules = ServerScriptService.ServerModules
+local TeamClass = require(serverModules.HideAndSeek.Team)
 
-local Hider = {}
+local Hider = TeamClass:create()
 
-function Hider:create(properties, teamName, teamBrickColor, teamToDeassignTo)
-    properties = properties or {
-        teamInstance = TeamCreateModule.create(teamName, teamBrickColor);
-        teamToDeassignTo = teamToDeassignTo
-    }
-
+function Hider:create(object, teamName, teamBrickColor, teamToDeassignTo)
+    object = object or TeamClass:create(object, teamName, teamBrickColor, teamToDeassignTo)
+    setmetatable(object, self)
     self.__index = self
-    return setmetatable(properties, self)
+    return object
 end
 
 
-function Hider:getPlayersInHiderTeam()
-    return self.teamInstance:GetPlayers()
+function Hider.onAssigning(player)
+
 end
 
 
-function Hider:assign(player)
-    assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
+function Hider.onDeassigning(player)
 
-    player.Team = self.teamInstance
-    -- Add more here
-end
-
-
-function Hider:deAssign(player)
-    assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
-
-    local playerOriginalTeam = player.Team
-    if playerOriginalTeam ~= self.teamInstance then return end
-
-    -- Do other things to de assign the players out of the hider team
-
-    player.Team = self.teamToDeassignTo
 end
 
 return Hider
