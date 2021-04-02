@@ -36,4 +36,6 @@ end
 local seekers = selectSeekers()
 local hiders = selectHiders()
 
+hideAndSeek.seeker:setHiderTeam(hideAndSeek.hider.teamInstance)
+hideAndSeek.seeker:setCapturedTeam(teamToDeassignTo, {workspace.Spectator})
 hideAndSeek:assignPlayersToTeam(hiders, seekers)

@@ -6,6 +6,7 @@ local Players = game:GetService("Players")
 
 local serverModules = ServerScriptService.ServerModules
 local TeamClass = require(serverModules.HideAndSeek.Team)
+local TeleportationModule = require(serverModules.Teleportation)
 
 local Seeker = TeamClass:create()
 
@@ -41,6 +42,7 @@ function Seeker:handleCapturing(partHit, seekerCharacter)
 
     local potentialHiderCharacter = partHit.Parent
 
+    if not potentialHiderCharacter:IsA("Model") then return end
     if potentialHiderCharacter == seekerCharacter then return end
     
     local player = Players:GetPlayerFromCharacter(potentialHiderCharacter)
@@ -48,12 +50,16 @@ function Seeker:handleCapturing(partHit, seekerCharacter)
 
     player.Team = self.capturedTeam
 
-    if not self.capturedTeamSpawns then return end
-    print("Teleports back (Have not implemented this yet")
+    local capturedTeamSpawns = self.capturedTeamSpawns
+
+    if not capturedTeamSpawns then return end
+
+    local randomCapturedTeamSpawn = capturedTeamSpawns[math.random(1, #capturedTeamSpawns)]
+    TeleportationModule.teleportToBasePart(potentialHiderCharacter, randomCapturedTeamSpawn)
 end
 
 
-function Seeker.onAssigning(player)
+function Seeker:onAssigning(player)
     -- playerCharacter is the character of the seeker.
     local playerCharacter = player.Character or player.CharacterAdded:Wait()
 
@@ -67,7 +73,7 @@ function Seeker.onAssigning(player)
 end
 
 
-function Seeker.onDeassigning(player)
+function Seeker:onDeassigning(player)
 
 end
 

@@ -43,7 +43,7 @@ function Team:assign(player)
 
     if self.onAssigning then
         assert(typeof(self.onAssigning) == "function", ".onAssigning is not a function")
-        self.onAssigning(player)
+        self:onAssigning(player)
     end
 end
 
@@ -58,7 +58,7 @@ function Team:deassign(player)
 
     if self.onDeassigning then
         assert(typeof(self.onDeassigning) == "function", ".onDeassigning is not a function")
-        self.onDeassigning(player)
+        self:onDeassigning(player)
     end
 end
 
