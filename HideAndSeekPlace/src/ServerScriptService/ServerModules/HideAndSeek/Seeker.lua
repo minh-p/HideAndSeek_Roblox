@@ -20,7 +20,11 @@ function Seeker:create(object, teamName, teamBrickColor, teamToDeassignTo)
     object = object or TeamClass:create(object, teamName, teamBrickColor, teamToDeassignTo)
     setmetatable(object, self)
     self.__index = self
+
     object.seekerBillboardGuiText = "It"
+    object.capturingEvents = {}
+    object.seekerBillboardTrees = {}
+
     return object
 end
 
@@ -62,30 +66,65 @@ function Seeker:handleCapturing(partHit, seekerCharacter)
     if not capturedTeamSpawns then return end
 
     local randomCapturedTeamSpawn = capturedTeamSpawns[math.random(1, #capturedTeamSpawns)]
-    TeleportationModule.teleportToBasePart(potentialHiderCharacter, randomCapturedTeamSpawn)
+    TeleportationModule.teleportToBasePart(seekerCharacter, randomCapturedTeamSpawn)
+end
+
+
+function Seeker:_enableHiderCapturing(seeker)
+    local seekerCharacter = seeker.Character or seeker.CharacterAdded:Wait()
+
+    self.capturingEvents[seeker] = {}
+
+    for _, part in ipairs(seekerCharacter:GetChildren()) do
+        if part:IsA("BasePart") then
+            local aCapturingEvent = part.Touched:Connect(function(partHit)
+                self:handleCapturing(partHit, seekerCharacter)
+            end)
+            table.insert(self.capturingEvents[seeker], aCapturingEvent)
+        end
+    end
+end
+
+
+function Seeker:_mountSeekerBillboard(player)
+    local playerIsSeeker = player.Team == self.teamInstance
+    if not playerIsSeeker then return end
+
+    local playerCharacter = player.Character or player.CharacterAdded:Wait()
+    -- A random thing I came up with. Not sure if the offset works or not.
+    local studsOffsetY = playerCharacter:GetExtentsSize().Y / 2 + 1
+    local seekerNameBillboard = SeekerNameBillboard.create(self.seekerBillboardGuiText, studsOffsetY)
+    self.seekerBillboardTrees[player] = Roact.mount(seekerNameBillboard, playerCharacter:WaitForChild("HumanoidRootPart"))
 end
 
 
 function Seeker:onAssigning(player)
-    -- playerCharacter is the character of the seeker.
-    local playerCharacter = player.Character or player.CharacterAdded:Wait()
+    self:_enableHiderCapturing(player)
+    self:_mountSeekerBillboard(player)
+end
 
-    for _, part in ipairs(playerCharacter:GetChildren()) do
-        if part:IsA("BasePart") then
-            part.Touched:Connect(function(partHit)
-                self:handleCapturing(partHit, playerCharacter)
-            end)
-        end
+
+function Seeker:_disableHiderCapturing(player)
+    local capturingEvents = self.capturingEvents[player]
+    if not capturingEvents then return end
+
+    for eventIndex, event in ipairs(capturingEvents) do
+        event:Disconnect()
+        self.capturingEvents[player][eventIndex] = nil
     end
+end
 
-    -- A random thing I came up with. Not sure if the offset works or not.
-    local studsOffsetY = playerCharacter:GetExtentsSize().Y / 2 + 1
-    Roact.mount(SeekerNameBillboard.create(self.seekerBillboardGuiText, studsOffsetY), playerCharacter:WaitForChild("HumanoidRootPart"))
+
+function Seeker:_unmountSeekerBillboard(player)
+    local seekerNameBillboardTree = self.seekerBillboardTrees[player]
+    if not seekerNameBillboardTree then return end
+    Roact.unmount(seekerNameBillboardTree)
 end
 
 
 function Seeker:onDeassigning(player)
-
+    self:_disableHiderCapturing(player)
+    self:_unmountSeekerBillboard(player)
 end
 
 return Seeker
