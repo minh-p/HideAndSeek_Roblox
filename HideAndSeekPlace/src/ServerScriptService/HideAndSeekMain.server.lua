@@ -39,11 +39,7 @@ local hiders = selectHiders()
 hideAndSeek.seeker:setHiderTeam(hideAndSeek.hider.teamInstance)
 hideAndSeek.seeker:setCapturedTeam(teamToDeassignTo, {workspace.Spectator})
 hideAndSeek.seeker:setSpawns({workspace.Seeker})
-
-wait(10)
-
-print"Yeet"
+hideAndSeek.seeker:setTeamToDeassignToSpawns({workspace.Spectator})
 
 hideAndSeek:assignPlayersToTeam(hiders, seekers)
 
-hideAndSeek.seeker:setTeamToDeassignToSpawns({workspace.Spectator})

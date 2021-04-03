@@ -18,7 +18,9 @@ function Teleportation.teleportToBasePart(object, basePart)
 
     assert(object:IsA("BasePart"), "Object or object's primary part needs to be a base part.")
 
-    object.CFrame = basePart.CFrame + Vector3.new(0, verticalOffset, 0)
+    local newObjectCFrame = basePart.CFrame + Vector3.new(0, verticalOffset, 0)
+    wait(1)
+    object.CFrame = newObjectCFrame
 end
 
 return Teleportation

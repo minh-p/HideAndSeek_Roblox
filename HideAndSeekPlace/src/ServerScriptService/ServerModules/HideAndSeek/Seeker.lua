@@ -94,6 +94,9 @@ function Seeker:_mountSeekerBillboard(player)
     -- A random thing I came up with. Not sure if the offset works or not.
     local studsOffsetY = playerCharacter:GetExtentsSize().Y / 2 + 1
     local seekerNameBillboard = SeekerNameBillboard.create(self.seekerBillboardGuiText, studsOffsetY)
+    local playerHumanoidRootPart = playerCharacter:FindFirstChild("HumanoidRootPart")
+
+    if not playerHumanoidRootPart then playerHumanoidRootPart = playerCharacter:WaitForChild("HumanoidRootPart") end
     self.seekerBillboardTrees[player] = Roact.mount(seekerNameBillboard, playerCharacter:WaitForChild("HumanoidRootPart"))
 end
 

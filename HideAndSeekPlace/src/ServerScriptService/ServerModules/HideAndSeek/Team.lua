@@ -14,7 +14,8 @@ function Team:create(object, teamName, teamBrickColor, teamToDeassignTo)
         teamInstance = TeamCreateModule.create(teamName, teamBrickColor),
         teleportOnAssign = true,
         teamToDeassignTo = teamToDeassignTo,
-        teleportOnDeassign = true
+        teleportOnDeassign = true,
+        deAssignOnDead = true
     }
 
     setmetatable(object, self)
@@ -60,15 +61,24 @@ function Team:assign(player)
     player.Team = self.teamInstance
 
 
+    local playerCharacter = player.Character or player.CharacterAdded:Wait()
     local teamSpawns = self.spawns
+
     if self.teleportOnAssign and teamSpawns then
-        local playerCharacter = player.Character or player.CharacterAdded:Wait()
         TeleportationModule.teleportToBasePart(playerCharacter, teamSpawns[math.random(1, #teamSpawns)])
     end
 
     if self.onAssigning then
         assert(typeof(self.onAssigning) == "function", ".onAssigning is not a function")
         self:onAssigning(player)
+    end
+
+    if self.deAssignOnDead then
+        playerCharacter:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
+            -- This makes the character to fully load in.
+            player.CharacterAdded:Wait()
+            self:deassign(player)
+        end)
     end
 end
 
