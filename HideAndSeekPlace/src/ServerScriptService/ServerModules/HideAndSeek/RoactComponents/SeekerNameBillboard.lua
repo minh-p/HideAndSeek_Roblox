@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Roact = require(ReplicatedStorage.SharedModules.Roact)
 
-local SeekerNameBillboard = {textSizeScaled = Vector2.new(0.4, 0.8)}
+local SeekerNameBillboard = {textSizeScaled = Vector2.new(0.5, 1)}
 
 local function getNumberOfLinesInText(text)
     if not text or text == "" then return 0 end
@@ -71,7 +71,9 @@ function SeekerNameBillboard.create(text, studsOffsetY)
         BillboardText = Roact.createElement("TextLabel", {
             Text = text,
             TextScaled = true,
-            BackgroundTransparency = 0.4,
+            BackgroundTransparency = 1,
+            TextStrokeTransparency = 0,
+            Font = Enum.Font.SourceSansBold,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             Size = UDim2.new(1, 0, 1, 0)
         })
