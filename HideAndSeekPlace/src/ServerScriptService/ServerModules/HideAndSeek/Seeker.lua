@@ -2,11 +2,17 @@
 -- minhnormal
 
 local ServerScriptService = game:GetService("ServerScriptService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local serverModules = ServerScriptService.ServerModules
-local TeamClass = require(serverModules.HideAndSeek.Team)
 local TeleportationModule = require(serverModules.Teleportation)
+
+local hideAndSeekModules = serverModules.HideAndSeek
+local TeamClass = require(hideAndSeekModules.Team)
+local SeekerNameBillboard = require(hideAndSeekModules.RoactComponents.SeekerNameBillboard)
+
+local Roact = require(ReplicatedStorage.SharedModules.Roact)
 
 local Seeker = TeamClass:create()
 
@@ -14,6 +20,7 @@ function Seeker:create(object, teamName, teamBrickColor, teamToDeassignTo)
     object = object or TeamClass:create(object, teamName, teamBrickColor, teamToDeassignTo)
     setmetatable(object, self)
     self.__index = self
+    object.seekerBillboardGuiText = "It"
     return object
 end
 
@@ -70,6 +77,10 @@ function Seeker:onAssigning(player)
             end)
         end
     end
+
+    -- A random thing I came up with. Not sure if the offset works or not.
+    local studsOffsetY = playerCharacter:GetExtentsSize().Y / 2 + 1
+    Roact.mount(SeekerNameBillboard.create(self.seekerBillboardGuiText, studsOffsetY), playerCharacter:WaitForChild("HumanoidRootPart"))
 end
 
 
