@@ -10,7 +10,7 @@ function Teleportation.teleportToBasePart(object, basePart)
 
     if object:IsA("Model") then
         assert(object.PrimaryPart, "Model needs to have Primary Part.")
-        verticalOffset = object:GetExtents().Y + basePart.Size.Y / 2
+        verticalOffset = object:GetExtentsSize().Y + basePart.Size.Y / 2
         object = object.PrimaryPart
     else
         verticalOffset = object.Size.Y + basePart.Size.Y / 2
