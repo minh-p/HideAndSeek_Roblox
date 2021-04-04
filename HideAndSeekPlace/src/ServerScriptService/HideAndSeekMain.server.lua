@@ -42,4 +42,3 @@ hideAndSeek.seeker:setSpawns({workspace.Seeker})
 hideAndSeek.seeker:setTeamToDeassignToSpawns({workspace.Spectator})
 
 hideAndSeek:assignPlayersToTeam(hiders, seekers)
-

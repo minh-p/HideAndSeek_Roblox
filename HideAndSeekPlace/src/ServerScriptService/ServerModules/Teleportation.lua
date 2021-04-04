@@ -19,6 +19,9 @@ function Teleportation.teleportToBasePart(object, basePart)
     assert(object:IsA("BasePart"), "Object or object's primary part needs to be a base part.")
 
     local newObjectCFrame = basePart.CFrame + Vector3.new(0, verticalOffset, 0)
+    -- Added a wait here. Somehow the it works, waiting for the a player's character
+    -- to be teleported to the spawn.
+    -- Might have to fix this.
     wait(1)
     object.CFrame = newObjectCFrame
 end

@@ -42,6 +42,7 @@ function Seeker:setCapturedTeam(team, spawns)
     if typeof(spawns) == "Instance" then
         spawns = spawns:GetChildren()
     end
+
     assert(typeof(spawns) == "table", "Given argument spawns needs to be a table or an Instance.")
     self.capturedTeamSpawns = spawns
 end
@@ -66,11 +67,24 @@ function Seeker:handleCapturing(partHit, seekerCharacter)
     if not capturedTeamSpawns then return end
 
     local randomCapturedTeamSpawn = capturedTeamSpawns[math.random(1, #capturedTeamSpawns)]
-    TeleportationModule.teleportToBasePart(seekerCharacter, randomCapturedTeamSpawn)
+    TeleportationModule.teleportToBasePart(potentialHiderCharacter, randomCapturedTeamSpawn)
+end
+
+
+function Seeker:_disableHiderCapturing(seeker)
+    local capturingEvents = self.capturingEvents[seeker]
+    if not capturingEvents then return end
+
+    for eventIndex, event in ipairs(capturingEvents) do
+        event:Disconnect()
+        self.capturingEvents[seeker][eventIndex] = nil
+    end
 end
 
 
 function Seeker:_enableHiderCapturing(seeker)
+    self:_disableHiderCapturing(seeker)
+
     local seekerCharacter = seeker.Character or seeker.CharacterAdded:Wait()
 
     self.capturingEvents[seeker] = {}
@@ -104,17 +118,6 @@ end
 function Seeker:onAssigning(player)
     self:_enableHiderCapturing(player)
     self:_mountSeekerBillboard(player)
-end
-
-
-function Seeker:_disableHiderCapturing(player)
-    local capturingEvents = self.capturingEvents[player]
-    if not capturingEvents then return end
-
-    for eventIndex, event in ipairs(capturingEvents) do
-        event:Disconnect()
-        self.capturingEvents[player][eventIndex] = nil
-    end
 end
 
 

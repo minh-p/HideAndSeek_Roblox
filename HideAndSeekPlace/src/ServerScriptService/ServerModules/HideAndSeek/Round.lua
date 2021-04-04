@@ -23,12 +23,14 @@ function Round:stop()
 end
 
 
+function Round:_handleIntermission(skipIntermission)
+    if skipIntermission then return end
+    -- Do the intermission
+end
+
+
 function Round:start(skipIntermission)
-    if skipIntermission then
-        -- Skip the intermission
-    else
-        -- Go on with the intermission
-    end
+    self:_handleIntermission(skipIntermission)
 
     self.onRoundStart()
 

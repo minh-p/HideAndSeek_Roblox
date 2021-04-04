@@ -55,52 +55,53 @@ function Team:getPlayersInTeam()
 end
 
 
+function Team:_handleTeleporting(player, spawns)
+    local playerCharacter = player.Character or player.CharacterAdded:Wait()
+    if not self.teleportOnAssign or not spawns then return end
+    TeleportationModule.teleportToBasePart(playerCharacter, spawns[math.random(1, #spawns)])
+end
+
+
+function Team:_handleDeassignOnDead(player)
+    if not self.deAssignOnDead then return end
+
+    local playerCharacter = player.Character or player.CharacterAdded:Wait()
+
+    playerCharacter:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
+        -- This makes the character to fully load in. But not teleported to spawn yet (if there is).
+        player.CharacterAdded:Wait()
+        self:deassign(player)
+    end)
+end
+
+
 function Team:assign(player)
     assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
 
     player.Team = self.teamInstance
 
+    self:_handleTeleporting(player, self.spawns)
+    self:_handleDeassignOnDead(player)
 
-    local playerCharacter = player.Character or player.CharacterAdded:Wait()
-    local teamSpawns = self.spawns
-
-    if self.teleportOnAssign and teamSpawns then
-        TeleportationModule.teleportToBasePart(playerCharacter, teamSpawns[math.random(1, #teamSpawns)])
-    end
-
-    if self.onAssigning then
-        assert(typeof(self.onAssigning) == "function", ".onAssigning is not a function")
-        self:onAssigning(player)
-    end
-
-    if self.deAssignOnDead then
-        playerCharacter:FindFirstChildWhichIsA("Humanoid").Died:Connect(function()
-            -- This makes the character to fully load in.
-            player.CharacterAdded:Wait()
-            self:deassign(player)
-        end)
-    end
+    if not self.onAssigning then return end
+    assert(typeof(self.onAssigning) == "function", ".onAssigning is not a function")
+    self:onAssigning(player)
 end
 
 
 function Team:deassign(player)
     assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
 
-    local playerOriginalTeam = player.Team
-    if playerOriginalTeam ~= self.teamInstance then return end
+    local playerIsNotFromTeamInstance = player.Team ~= self.teamInstance
+    if playerIsNotFromTeamInstance then return end
 
     player.Team = self.teamToDeassignTo
 
-    if self.teleportOnDeassign and self.teamToDeassignToSpawns then
-        local playerCharacter = player.Character or player.CharacterAdded:Wait()
-        local teamToDeassignToSpawns = self.teamToDeassignToSpawns
-        TeleportationModule.teleportToBasePart(playerCharacter, teamToDeassignToSpawns[math.random(1, #teamToDeassignToSpawns)])
-    end
+    self:_handleTeleporting(player, self.teamToDeassignToSpawns)
 
-    if self.onDeassigning then
-        assert(typeof(self.onDeassigning) == "function", ".onDeassigning is not a function")
-        self:onDeassigning(player)
-    end
+    if not self.onDeassigning then return end
+    assert(typeof(self.onDeassigning) == "function", ".onDeassigning is not a function")
+    self:onDeassigning(player)
 end
 
 return Team
