@@ -13,18 +13,20 @@ local hideAndSeekModules = localPlayer.PlayerScripts.ClientModules.HideAndSeek
 
 local roactComponents = hideAndSeekModules.RoactComponents
 local SpectateGui = require(roactComponents.SpectateGui)
-local createSpectatePopUpButton = require(roactComponents.createSpectatePopUpButton)
 
 local Spectate = {}
 
-function Spectate:create(object, spectateGuiElement)
+function Spectate:create(object, spectateGuiCreateFunction)
     object = object or {
         playerSpectatingTo = nil,
-        spectateGuiTree = Roact.mount(spectateGuiElement, localPlayer.PlayerGui)
+        spectateGuiCreateFunction = spectateGuiCreateFunction or SpectateGui.create
     }
 
     setmetatable(object, self)
     self.__index = self
+
+    object.spectateGuiTree = Roact.mount(object.spectateGuiCreateFunction(false, function() object:onPopUpActivated() end), localPlayer.PlayerGui)
+
     return object
 end
 
@@ -45,15 +47,24 @@ local function getRandomPlayer()
 end
 
 
+function Spectate:onPopUpActivated()
+    if self.spectateToggled then
+        self:untoggleGui()
+    else
+        self:toggleGui()
+    end
+end
+
+
 function Spectate:toggleGui()
     self.spectateToggled = true
 
     local playerGui = localPlayer.PlayerGui
 
     if self.spectateGuiTree then
-        self.spectateGuiTree = Roact.update(self.spectateGuiTree, SpectateGui.create(self.spectateToggled))
+        self.spectateGuiTree = Roact.update(self.spectateGuiTree, self.spectateGuiCreateFunction(self.spectateToggled, function() self:onPopUpActivated() end))
     else
-        self.spectateGuiTree = Roact.mount(SpectateGui.create(self.spectateToggled), playerGui)
+        self.spectateGuiTree = Roact.mount(self.spectateGuiCreateFunction(self.spectateToggled, function() self:onPopUpActivated() end), playerGui)
     end
 
     self:toggle(getRandomPlayer)
@@ -63,21 +74,8 @@ end
 function Spectate:untoggleGui()
     self.spectateToggled = false
     if not self.spectateGuiTree then return end
-    Roact.update(self.spectateGuiTree, SpectateGui.create(self.spectateToggled))
+    Roact.update(self.spectateGuiTree, self.spectateGuiCreateFunction(self.spectateToggled, function() self:onPopUpActivated() end))
     self:untoggle()
-end
-
-
-function Spectate:initializeGuis()
-    local spectatePopUp = createSpectatePopUpButton(function()
-        if self.spectateToggled then
-            self:untoggleGui()
-        else
-            self:toggleGui()
-        end
-    end)
-
-    Roact.mount(spectatePopUp, localPlayer.PlayerGui)
 end
 
 return Spectate

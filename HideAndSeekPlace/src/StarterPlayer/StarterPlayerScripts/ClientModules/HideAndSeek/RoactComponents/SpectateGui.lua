@@ -7,19 +7,16 @@ local Roact = require(ReplicatedStorage.SharedModules.Roact)
 
 local SpectateGui = {}
 
-function SpectateGui.create(spectateToggled)
+function SpectateGui.create(spectateToggled, popUpActivatedFunc)
     return Roact.createElement("ScreenGui", {
-        Name = "Spectate",
         Enabled = true
     }, {
         Interface = Roact.createElement("Frame", {
-            Name = "Interface",
             Size = UDim2.new(1, 0, 1, 0),
             Visible = spectateToggled,
             BackgroundTransparency = 1
         }, {
             UpperFrame = Roact.createElement("Frame", {
-                Name = "UpperFrame",
                 Size = UDim2.new(1, 0, 0.18, 0),
                 AnchorPoint = Vector2.new(0.5, 0.5),
                 Position = UDim2.new(0.5, 0, 0.035, 0),
@@ -36,6 +33,16 @@ function SpectateGui.create(spectateToggled)
                 BackgroundTransparency = 0.45
             }, {})
         }),
+
+        PopUp = Roact.createElement("ImageButton", {
+            BackgroundTransparency = 0.8,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            Size = UDim2.new(0.1, 0, 0.1, 0),
+            AnchorPoint = Vector2.new(0.5, 0.5),
+            Position = UDim2.new(0.9, 0, 0.5, 0),
+
+            [Roact.Event.Activated] = popUpActivatedFunc or function() end
+        })
     })
 end
 
