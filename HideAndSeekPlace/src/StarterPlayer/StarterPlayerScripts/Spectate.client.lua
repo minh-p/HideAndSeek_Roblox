@@ -9,4 +9,4 @@ local hideAndSeekModules = localPlayer.PlayerScripts:WaitForChild("ClientModules
 local spectateGuiElement = require(hideAndSeekModules.RoactComponents.SpectateGui).create(false)
 local spectate = require(hideAndSeekModules.Spectate.Spectate):create(nil, spectateGuiElement)
 
-spectate:toggle()
+spectate:initializeGuis()

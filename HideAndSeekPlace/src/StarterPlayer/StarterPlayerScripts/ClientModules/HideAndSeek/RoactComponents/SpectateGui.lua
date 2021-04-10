@@ -10,25 +10,32 @@ local SpectateGui = {}
 function SpectateGui.create(spectateToggled)
     return Roact.createElement("ScreenGui", {
         Name = "Spectate",
-        Enabled = spectateToggled
+        Enabled = true
     }, {
-        UpperFrame = Roact.createElement("Frame", {
-            Name = "UpperFrame",
-            Size = UDim2.new(1, 0, 0.18, 0),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.new(0.5, 0, 0.035, 0),
-            BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-            BackgroundTransparency = 0.45
-        }, {}),
+        Interface = Roact.createElement("Frame", {
+            Name = "Interface",
+            Size = UDim2.new(1, 0, 1, 0),
+            Visible = spectateToggled,
+            BackgroundTransparency = 1
+        }, {
+            UpperFrame = Roact.createElement("Frame", {
+                Name = "UpperFrame",
+                Size = UDim2.new(1, 0, 0.18, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.035, 0),
+                BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+                BackgroundTransparency = 0.45
+            }, {}),
 
-        LowerFrame = Roact.createElement("Frame", {
-            Name = "LowerFrame",
-            Size = UDim2.new(1, 0, 0.18, 0),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.new(0.5, 0, 0.92, 0),
-            BackgroundColor3 = Color3.fromRGB(25, 25, 25),
-            BackgroundTransparency = 0.45
-        }, {})
+            LowerFrame = Roact.createElement("Frame", {
+                Name = "LowerFrame",
+                Size = UDim2.new(1, 0, 0.18, 0),
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.92, 0),
+                BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+                BackgroundTransparency = 0.45
+            }, {})
+        }),
     })
 end
 
