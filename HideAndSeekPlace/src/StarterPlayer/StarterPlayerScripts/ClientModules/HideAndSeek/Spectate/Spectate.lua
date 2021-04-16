@@ -16,34 +16,19 @@ local SpectateGui = require(roactComponents.SpectateGui)
 
 local Spectate = {}
 
-function Spectate:create(object, spectateGuiCreateFunction)
-    object = object or {
-        playerSpectatingTo = nil,
-        spectateGuiCreateFunction = spectateGuiCreateFunction or SpectateGui.create
-    }
+local function getRandomPlayer()
+    local players = Players:GetPlayers()
+    return players[RNG:NextInteger(1, #players)]
+end
 
-    setmetatable(object, self)
-    self.__index = self
 
-    object.spectateGuiTree = Roact.mount(object.spectateGuiCreateFunction(false, function() object:onPopUpActivated() end), localPlayer.PlayerGui)
-
-    return object
+function Spectate:untoggle()
+    self.currentPlayerSpectatingTo = nil
 end
 
 
 function Spectate:toggle(playerToSpectate)
 
-end
-
-
-function Spectate:untoggle()
-
-end
-
-
-local function getRandomPlayer()
-    local players = Players:GetPlayers()
-    return players[RNG:NextInteger(1, #players)]
 end
 
 
@@ -62,9 +47,10 @@ function Spectate:toggleGui()
     local playerGui = localPlayer.PlayerGui
 
     if self.spectateGuiTree then
-        self.spectateGuiTree = Roact.update(self.spectateGuiTree, self.spectateGuiCreateFunction(self.spectateToggled, function() self:onPopUpActivated() end))
+        self.spectateGuiTree = Roact.update(self.spectateGuiTree, self.spectateGuiCreateFunction(self.spectateToggled, table.unpack(self.spectateGuiCreatingRequiredFunctions)))
     else
-        self.spectateGuiTree = Roact.mount(self.spectateGuiCreateFunction(self.spectateToggled, function() self:onPopUpActivated() end), playerGui)
+        print(self.spectateGuiCreateFunction)
+        self.spectateGuiTree = Roact.mount(self.spectateGuiCreateFunction(self.spectateToggled, table.unpack(self.spectateGuiCreatingRequiredFunctions)), playerGui)
     end
 
     self:toggle(getRandomPlayer)
@@ -74,8 +60,45 @@ end
 function Spectate:untoggleGui()
     self.spectateToggled = false
     if not self.spectateGuiTree then return end
-    Roact.update(self.spectateGuiTree, self.spectateGuiCreateFunction(self.spectateToggled, function() self:onPopUpActivated() end))
+    Roact.update(self.spectateGuiTree, self.spectateGuiCreateFunction(self.spectateToggled, table.unpack(self.spectateGuiCreatingRequiredFunctions)))
     self:untoggle()
+end
+
+
+function Spectate:spectatePreviousPlayer()
+end
+
+
+function Spectate:spectateNextPlayer()
+end
+
+
+function Spectate:create(object, spectateGuiCreateFunction)
+    object = object or {
+        currentPlayerSpectatingTo = nil,
+        spectateGuiCreateFunction = spectateGuiCreateFunction or SpectateGui.create
+    }
+
+    setmetatable(object, self)
+    self.__index = self
+
+    object.spectateGuiCreatingRequiredFunctions = {
+        function()
+            object:onPopUpActivated()
+        end,
+
+        function()
+            object:spectatePreviousPlayer()
+        end,
+
+        function()
+            object:spectateNextPlayer()
+        end
+    }
+
+    object.spectateGuiTree = Roact.mount(object.spectateGuiCreateFunction(false, table.unpack(object.spectateGuiCreatingRequiredFunctions)), localPlayer.PlayerGui)
+
+    return object
 end
 
 return Spectate
