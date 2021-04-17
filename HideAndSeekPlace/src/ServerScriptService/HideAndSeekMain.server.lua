@@ -23,7 +23,7 @@ local hideAndSeek = HideAndSeekClass:create(nil, SEEKER_TEAM_NAME, SEEKER_TEAM_B
 
 local function selectSeekers()
     return {
-        Players:WaitForChild("minhnormal")
+        Players:WaitForChild("whateverminecraff")
     }
 end
 
