@@ -24,6 +24,7 @@ function Seeker:create(object, teamName, teamBrickColor, teamToDeassignTo)
     object.seekerBillboardGuiText = "It"
     object.capturingEvents = {}
     object.seekerBillboardTrees = {}
+    object.captureQueue = {}
 
     return object
 end
@@ -58,7 +59,10 @@ function Seeker:handleCapturing(partHit, seekerCharacter)
     if potentialHiderCharacter == seekerCharacter then return end
     
     local player = Players:GetPlayerFromCharacter(potentialHiderCharacter)
-    if not player or not player.Team == self.hiderTeam then return end
+    if not player or player.Team ~= self.hiderTeam or player.Team == self.capturedTeam then return end
+
+    if table.find(self.captureQueue, player) then return end
+    table.insert(self.captureQueue, player)
 
     player.Team = self.capturedTeam
 
@@ -68,6 +72,8 @@ function Seeker:handleCapturing(partHit, seekerCharacter)
 
     local randomCapturedTeamSpawn = capturedTeamSpawns[math.random(1, #capturedTeamSpawns)]
     TeleportationModule.teleportToBasePart(potentialHiderCharacter, randomCapturedTeamSpawn)
+
+    self.captureQueue = {}
 end
 
 
