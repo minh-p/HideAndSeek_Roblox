@@ -46,7 +46,7 @@ local function getPlayerHumanoid()
 end
 
 
-function Spectate:setPlayerWalkSpeedAndJumpPower(walkspeed, jumpPower)
+function Spectate:setPlayerWalkSpeedAndJumpPower(walkSpeed, jumpPower)
     self.setPlayerWalkSpeedAndJumpPowerRemote:FireServer(walkSpeed, jumpPower)
 end
 
@@ -55,7 +55,6 @@ function Spectate:untoggle()
     self.currentPlayerSpectatingTo = nil
 
     local playerHumanoid = getPlayerHumanoid()
-    print(self.originalJumpPower, self.originalWalkSpeed)
     self:setPlayerWalkSpeedAndJumpPower(self.originalWalkSpeed, self.originalJumpPower)
 
     workspace.CurrentCamera.CameraSubject = playerHumanoid
@@ -128,6 +127,7 @@ end
 
 function Spectate:toggleGui()
     self:untoggleGui()
+    if #self.spectateList == 0 then return end
     self.spectateToggled = true
 
     local playerGui = localPlayer.PlayerGui

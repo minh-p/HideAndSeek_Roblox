@@ -21,6 +21,10 @@ function PlayerWalkSpeedAndJumpPowerSetter:create(object)
 
         setPlayerWalkSpeedAndJumpPowerRemote = BazirRemote.new("setPlayerWalkSpeedAndJumpPower")
     }
+
+    self.__index = self
+    setmetatable(object, self)
+    return object
 end
 
 
