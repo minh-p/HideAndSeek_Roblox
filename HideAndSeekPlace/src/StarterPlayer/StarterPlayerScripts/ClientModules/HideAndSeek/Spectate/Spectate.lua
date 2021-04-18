@@ -11,7 +11,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local RNG = Random.new()
-local Roact = require(ReplicatedStorage.SharedModules.Roact)
+
+local sharedModules = ReplicatedStorage.SharedModules
+local BazirRemote = require(sharedModules.BazirRemote)
+local Roact = require(sharedModules.Roact)
 
 local localPlayer = Players.LocalPlayer
 
@@ -22,9 +25,17 @@ local SpectateGui = require(roactComponents.SpectateGui)
 
 local Spectate = {}
 
+
+local function tableIsEmpty(t)
+    if not t then return end
+    return next(t) == nil
+end
+
+
 function Spectate:_getRandomPlayerToBeSpectated()
     -- returns a random player that is valid to be spectated
-    self.currentPlayerListIndex = math.clamp(RNG:NextInteger(1, #self.spectateList), 1, #Players:GetPlayers())
+    if tableIsEmpty(self.spectateList) then return end
+    self.currentPlayerListIndex = RNG:NextInteger(1, #self.spectateList)
     return self.spectateList[self.currentPlayerListIndex]
 end
 
@@ -35,10 +46,8 @@ local function getPlayerHumanoid()
 end
 
 
-local function setPlayerWalkSpeedAndJumpPower(walkspeed, jumpPower)
-    local playerHumanoid = getPlayerHumanoid()
-    playerHumanoid.WalkSpeed = walkspeed or 16
-    playerHumanoid.JumpPower = jumpPower or 50
+function Spectate:setPlayerWalkSpeedAndJumpPower(walkspeed, jumpPower)
+    self.setPlayerWalkSpeedAndJumpPowerRemote:FireServer(walkSpeed, jumpPower)
 end
 
 
@@ -46,15 +55,10 @@ function Spectate:untoggle()
     self.currentPlayerSpectatingTo = nil
 
     local playerHumanoid = getPlayerHumanoid()
-    setPlayerWalkSpeedAndJumpPower(self.originalWalkSpeed, self.originalJumpPower)
+    print(self.originalJumpPower, self.originalWalkSpeed)
+    self:setPlayerWalkSpeedAndJumpPower(self.originalWalkSpeed, self.originalJumpPower)
 
     workspace.CurrentCamera.CameraSubject = playerHumanoid
-end
-
-
-local function tableIsEmpty(t)
-    if not t then return end
-    return next(t) == nil
 end
 
 
@@ -86,9 +90,6 @@ end
 
 
 function Spectate:toggle(playerToSpectateTo)
-    print(#self.spectateList)
-    print(self.currentPlayerListIndex)
-
     if not playerToSpectateTo then
         warn("No player to spectate to or invalid argument playerToSpectateTo needs to be a player")
         return
@@ -96,18 +97,15 @@ function Spectate:toggle(playerToSpectateTo)
 
     if not self:_playerIsSpectatable(playerToSpectateTo) then return end
 
-    local localPlayerHumanoid = getPlayerHumanoid()
-
-    self.originalWalkSpeed = localPlayerHumanoid.WalkSpeed
-    self.originalJumpPower = localPlayerHumanoid.JumpPower
-
     -- Renders player immovable.
-    setPlayerWalkSpeedAndJumpPower(0, 0)
+    self:setPlayerWalkSpeedAndJumpPower(0, 0)
 
-    pcall(function()
+    local _, err = pcall(function()
         local playerToSpectateToCharacter = playerToSpectateTo.Character or playerToSpectateTo.CharacterAdded:Wait()
-        workspace.CurrentCamera.CameraType.CameraSubject = playerToSpectateToCharacter
+        workspace.CurrentCamera.CameraSubject = playerToSpectateToCharacter.Humanoid
     end)
+
+    warn(err)
 end
 
 
@@ -122,9 +120,9 @@ end
 
 function Spectate:untoggleGui()
     self.spectateToggled = false
+    self:untoggle()
     if not self.spectateGuiTree then return end
     Roact.update(self.spectateGuiTree, self.createSpectateGui(self.spectateToggled, table.unpack(self.spectateGuiCreatingRequiredFunctions)))
-    self:untoggle()
 end
 
 
@@ -190,7 +188,9 @@ function Spectate:create(object, createSpectateGui)
         createSpectateGui = createSpectateGui or SpectateGui.create,
         originalWalkSpeed = 16,
         originalJumpPower = 50,
-        teamsAllowedToBeSpectated = {}
+        teamsAllowedToBeSpectated = {},
+
+        setPlayerWalkSpeedAndJumpPowerRemote = BazirRemote.new("setPlayerWalkSpeedAndJumpPower")
     }
 
     setmetatable(object, self)
@@ -219,6 +219,12 @@ end
 
 function Spectate:setTeamsAllowedToBeSpectated(teamsAllowedToBeSpectated)
     self.teamsAllowedToBeSpectated = teamsAllowedToBeSpectated
+end
+
+
+function Spectate:setOriginalWalkSpeedAndJumpPower(walkSpeed, jumpPower)
+    self.originalWalkSpeed = walkSpeed or 16
+    self.originalJumpPower = jumpPower or 50
 end
 
 return Spectate
