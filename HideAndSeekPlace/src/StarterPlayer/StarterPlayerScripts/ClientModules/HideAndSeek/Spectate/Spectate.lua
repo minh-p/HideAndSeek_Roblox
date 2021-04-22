@@ -127,7 +127,6 @@ end
 
 function Spectate:toggleGui()
     self:untoggleGui()
-    if #self.spectateList == 0 then return end
     self.spectateToggled = true
 
     local playerGui = localPlayer.PlayerGui
