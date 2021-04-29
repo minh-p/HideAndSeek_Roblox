@@ -5,11 +5,15 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Players = game:GetService("Players")
 
 local serverModules = ServerScriptService.ServerModules
+
+local hideAndSeekModules = serverModules.HideAndSeek
 local HideAndSeekClass = require(serverModules.HideAndSeek.HideAndSeek)
-local TeamCreateModule = require(serverModules.TeamCreate)
 
 -- Gui components:
+local roactComponents = hideAndSeekModules.RoactComponents
+local timerGuiCreateFunc = require(roactComponents.createTimer)
 
+local TeamCreateModule = require(serverModules.TeamCreate)
 
 local SEEKER_TEAM_NAME = "Seeker"
 local SEEKER_TEAM_BRICKCOLOR = BrickColor.new("Really red")
@@ -26,7 +30,7 @@ local hideAndSeek = HideAndSeekClass:create(nil, SEEKER_TEAM_NAME, SEEKER_TEAM_B
 
 local function selectSeekers()
     return {
-        Players:WaitForChild("whateverminecraff")
+        Players:WaitForChild("minhnormal")
     }
 end
 
@@ -48,4 +52,5 @@ hideAndSeek:assignPlayersToTeam(hiders, seekers)
 
 -- configuring round
 hideAndSeek.round.timerGuiCreateFunc = timerGuiCreateFunc
+
 hideAndSeek.round:start()
