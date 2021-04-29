@@ -8,6 +8,9 @@ local serverModules = ServerScriptService.ServerModules
 local HideAndSeekClass = require(serverModules.HideAndSeek.HideAndSeek)
 local TeamCreateModule = require(serverModules.TeamCreate)
 
+-- Gui components:
+
+
 local SEEKER_TEAM_NAME = "Seeker"
 local SEEKER_TEAM_BRICKCOLOR = BrickColor.new("Really red")
 
@@ -42,3 +45,7 @@ hideAndSeek.seeker:setSpawns({workspace.Seeker})
 hideAndSeek.seeker:setTeamToDeassignToSpawns({workspace.Spectator})
 
 hideAndSeek:assignPlayersToTeam(hiders, seekers)
+
+-- configuring round
+hideAndSeek.round.timerGuiCreateFunc = timerGuiCreateFunc
+hideAndSeek.round:start()
