@@ -78,10 +78,9 @@ end
 function Team:assign(player)
     assert(typeof(player) == "Instance" and player:IsA("Player"), "Given argument: player needs to be an Instance Player")
 
-    player.Team = self.teamInstance
-
     self:_handleTeleporting(player, self.spawns)
     self:_handleDeassignOnDead(player)
+    player.Team = self.teamInstance
 
     if not self.onAssigning then return end
     assert(typeof(self.onAssigning) == "function", ".onAssigning is not a function")
