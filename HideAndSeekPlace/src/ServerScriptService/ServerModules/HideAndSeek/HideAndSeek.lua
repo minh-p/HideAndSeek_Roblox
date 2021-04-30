@@ -16,7 +16,8 @@ function HideAndSeek:create(object, seekerTeamName, seekerTeamBrickColor, hiderT
     }
 
     self.__index = self
-    return setmetatable(object, self)
+    setmetatable(object, self)
+    return object
 end
 
 

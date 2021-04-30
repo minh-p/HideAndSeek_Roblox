@@ -48,9 +48,10 @@ hideAndSeek.seeker:setCapturedTeam(teamToDeassignTo, {workspace.Spectator})
 hideAndSeek.seeker:setSpawns({workspace.Seeker})
 hideAndSeek.seeker:setTeamToDeassignToSpawns({workspace.Spectator})
 
-hideAndSeek:assignPlayersToTeam(hiders, seekers)
-
 -- configuring round
 hideAndSeek.round.timerGuiCreateFunc = timerGuiCreateFunc
+hideAndSeek.round.onRoundStart = function()
+    hideAndSeek:assignPlayersToTeam(hiders, seekers)
+end
 
 hideAndSeek.round:start()
